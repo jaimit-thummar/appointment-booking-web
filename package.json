@@ -1,0 +1,17 @@
+{
+  "name": "appointment-booking-web",
+  "version": "1.0.0",
+  "description": "MediBook Surat appointment booking website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Jaimit Thummar",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
