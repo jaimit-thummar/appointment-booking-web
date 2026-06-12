@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediBook Surat | Book Doctor Appointments Instantly</title>
+    <meta name="description" content="Book appointments with the best doctors and hospitals in Surat, Gujarat. Search by specialty, name or location and confirm instantly.">
+    <link rel="stylesheet" href="index.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- AG Navbar -->
+    <nav class="ag-navbar">
+        <div class="ag-container ag-navbar-content">
+            <a href="#" class="ag-logo">
+                <i data-lucide="activity"></i>
+                MediBook Surat
+            </a>
+            <div class="ag-nav-links">
+                <a href="#" class="ag-nav-link">Home</a>
+                <a href="#doctors" class="ag-nav-link">Doctors</a>
+                <a href="#" class="ag-nav-link">About</a>
+                <a href="#" class="ag-nav-link">Contact</a>
+            </div>
+            <button class="ag-button ag-button-primary">Login</button>
+        </div>
+    </nav>
+
+    <!-- AG Hero Section -->
+    <header class="ag-hero">
+        <div class="ag-container">
+            <h1 class="ag-hero-headline">Book Your Doctor Appointment<br>Instantly in Surat</h1>
+            <p class="ag-hero-subheadline">Search by doctor name or hospital — confirm your visit in seconds with the trusted healthcare network of Gujarat.</p>
+            
+            <div class="ag-search-container">
+                <i data-lucide="search" class="ag-search-icon"></i>
+                <input type="text" id="searchInput" class="ag-search-input" placeholder="Search doctor or hospital...">
+            </div>
+
+            <div class="ag-chip-group" id="specialtyFilters">
+                <span class="ag-chip active" data-specialty="All">All</span>
+                <span class="ag-chip" data-specialty="Cardiology">Cardiology</span>
+                <span class="ag-chip" data-specialty="Neurology">Neurology</span>
+                <span class="ag-chip" data-specialty="Orthopedics">Orthopedics</span>
+                <span class="ag-chip" data-specialty="Dermatology">Dermatology</span>
+                <span class="ag-chip" data-specialty="Pediatrics">Pediatrics</span>
+                <span class="ag-chip" data-specialty="Gynecology">Gynecology</span>
+                <span class="ag-chip" data-specialty="General Medicine">General Medicine</span>
+                <span class="ag-chip" data-specialty="ENT">ENT</span>
+                <span class="ag-chip" data-specialty="Ophthalmology">Ophthalmology</span>
+                <span class="ag-chip" data-specialty="Dentistry">Dentistry</span>
+                <span class="ag-chip" data-specialty="Psychiatry">Psychiatry</span>
+                <span class="ag-chip" data-specialty="Urology">Urology</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- AG Results Grid -->
+    <main class="ag-container" id="doctors">
+        <div class="ag-grid ag-grid-2" id="doctorGrid">
+            <!-- Cards will be injected by JS -->
+        </div>
+    </main>
+
+    <!-- AG Modal: Booking -->
+    <div class="ag-modal-overlay" id="bookingModalOverlay">
+        <div class="ag-modal">
+            <div class="ag-modal-header">
+                <h2 style="font-size: 1.25rem;">Book Appointment</h2>
+                <button class="ag-close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="ag-modal-body">
+                <form id="bookingForm">
+                    <!-- Info (Read Only) -->
+                    <div class="ag-form-section">
+                        <div class="ag-section-title">Hospital & Doctor Details</div>
+                        <div class="ag-grid ag-grid-2">
+                            <div class="ag-form-group">
+                                <label class="ag-label">Hospital</label>
+                                <input type="text" id="modalHospital" class="ag-input ag-input-readonly" readonly>
+                            </div>
+                            <div class="ag-form-group">
+                                <label class="ag-label">Doctor</label>
+                                <input type="text" id="modalDoctor" class="ag-input ag-input-readonly" readonly>
+                            </div>
+                        </div>
+                        <div class="ag-form-group">
+                            <label class="ag-label">Location</label>
+                            <input type="text" id="modalLocation" class="ag-input ag-input-readonly" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Patient Info -->
+                    <div class="ag-form-section">
+                        <div class="ag-section-title">Patient Information</div>
+                        <div class="ag-form-group">
+                            <label class="ag-label">Full Name *</label>
+                            <input type="text" name="fullName" class="ag-input" required placeholder="Enter patient name">
+                            <div class="ag-error-msg">Please enter full name</div>
+                        </div>
+                        <div class="ag-grid ag-grid-2">
+                            <div class="ag-form-group">
+                                <label class="ag-label">Date of Birth *</label>
+                                <input type="date" name="dob" class="ag-input" required>
+                                <div class="ag-error-msg">DOB is required</div>
+                            </div>
+                            <div class="ag-form-group">
+                                <label class="ag-label">Mobile Number *</label>
+                                <input type="tel" name="mobile" class="ag-input" required placeholder="+91 00000 00000" pattern="[0-9]{10}">
+                                <div class="ag-error-msg">Enter valid 10-digit number</div>
+                            </div>
+                        </div>
+                        <div class="ag-form-group">
+                            <label class="ag-label">Health Issue (Optional)</label>
+                            <textarea name="issue" class="ag-textarea" rows="3" placeholder="Describe your symptoms (optional)"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Appointment Slot -->
+                    <div class="ag-form-section">
+                        <div class="ag-section-title">Schedule Slot</div>
+                        <div class="ag-grid ag-grid-2">
+                            <div class="ag-form-group">
+                                <label class="ag-label">Date *</label>
+                                <input type="date" id="appointmentDate" name="appDate" class="ag-input" required>
+                                <div class="ag-error-msg">Select a future date</div>
+                            </div>
+                            <div class="ag-form-group">
+                                <label class="ag-label">Time Slot *</label>
+                                <select name="timeSlot" class="ag-select" required>
+                                    <option value="">Select Time</option>
+                                    <option>9:00 AM</option>
+                                    <option>10:00 AM</option>
+                                    <option>11:00 AM</option>
+                                    <option>12:00 PM</option>
+                                    <option>2:00 PM</option>
+                                    <option>3:00 PM</option>
+                                    <option>4:00 PM</option>
+                                    <option>5:00 PM</option>
+                                </select>
+                                <div class="ag-error-msg">Select a time slot</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="ag-button ag-button-primary ag-button-full">Confirm Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AG Notifications -->
+    <div class="ag-notification-container" id="notifContainer"></div>
+
+    <!-- AG Footer -->
+    <footer class="ag-footer">
+        <div class="ag-container ag-footer-content">
+            <a href="#" class="ag-logo" style="color: white; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="activity"></i>
+                MediBook Surat
+            </a>
+            <p class="ag-footer-text">&copy; 2025 MediBook Surat &middot; All Rights Reserved &middot; Surat, Gujarat</p>
+            <p class="ag-footer-text" style="margin-top: 0.5rem; font-size: 0.8rem;">Building for a Healthier Diamond City</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
