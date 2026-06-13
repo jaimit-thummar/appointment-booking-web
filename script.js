@@ -1,4 +1,4 @@
-// MediBook Surat - Application Logic
+// MediNexus Surat - Application Logic
 
 // 1. Dummy Data: 10 Doctors across Surat
 const doctors = [

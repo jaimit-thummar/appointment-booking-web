@@ -1,7 +1,7 @@
 {
   "name": "appointment-booking-web",
   "version": "1.0.0",
-  "description": "MediBook Surat appointment booking website",
+  "description": "MediNexus Surat appointment booking website",
   "main": "index.html",
   "scripts": {
     "dev": "vite",
