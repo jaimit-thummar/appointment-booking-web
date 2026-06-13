@@ -224,3 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDoctors();
     lucide.createIcons();
 });
+
+// Expose functions to window for inline onclick handlers (needed for Vite module bundling)
+window.openBookingModal = openBookingModal;
+window.closeBookingModal = closeBookingModal;
