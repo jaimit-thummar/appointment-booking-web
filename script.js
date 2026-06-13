@@ -2,16 +2,16 @@
 
 // 1. Dummy Data: 10 Doctors across Surat
 const doctors = [
-    { id: 1, name: "Dr. Vishal Vanani", specialty: "Cardiology", hospital: "Surat Heart Clinic", location: "Adajan", phone: "+91 98251 11001" },
-    { id: 2, name: "Dr. Priya Mehta", specialty: "Neurology", hospital: "NeuroLife Hospital", location: "Vesu", phone: "+91 98252 22002" },
-    { id: 3, name: "Dr. Rakesh Shah", specialty: "Orthopedics", hospital: "BoneCare Clinic", location: "Athwa", phone: "+91 98253 33003" },
-    { id: 4, name: "Dr. Sneha Patel", specialty: "Dermatology", hospital: "SkinGlow Center", location: "Citylight", phone: "+91 98254 44004" },
-    { id: 5, name: "Dr. Amit Desai", specialty: "Pediatrics", hospital: "KidsCare Clinic", location: "Katargam", phone: "+91 98255 55005" },
-    { id: 6, name: "Dr. Kavita Joshi", specialty: "Gynecology", hospital: "MothersFirst Hospital", location: "Varachha", phone: "+91 98256 66006" },
-    { id: 7, name: "Dr. Nitin Trivedi", specialty: "General Medicine", hospital: "MediPlus Clinic", location: "Udhna", phone: "+91 98257 77007" },
-    { id: 8, name: "Dr. Harsha Kapoor", specialty: "ENT", hospital: "ClearSound Clinic", location: "Piplod", phone: "+91 98258 88008" },
-    { id: 9, name: "Dr. Rajan Nair", specialty: "Ophthalmology", hospital: "VisionPlus Eye Clinic", location: "Althan", phone: "+91 98259 99009" },
-    { id: 10, name: "Dr. Meena Kulkarni", specialty: "Psychiatry", hospital: "MindWell Center", location: "Bhatar", phone: "+91 98250 10010" }
+    { 
+        id: 1, 
+        name: "Dr. Vishal Vanani", 
+        specialty: "Cardiology", 
+        hospital: "Dr. Vishal Heart Care", 
+        location: "G7, Infinity tower, Railway Station Cir, near Ayurvedic college, Suryapur Gate, Varachha, Surat, Gujarat 395003", 
+        phone: "09979775172",
+        timing: "Monday to Saturday (10:00 AM to 1:00 PM)",
+        slots: ["10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM"]
+    }
 ];
 
 // Specialty color mapping for AG Badges
@@ -66,13 +66,17 @@ function renderDoctors() {
                     <div class="ag-avatar">${initials}</div>
                     <div class="ag-doctor-name">${doc.name}</div>
                 </div>
-                <div class="ag-info-row" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(doc.location + ', Surat')}', '_blank')">
+                <div class="ag-info-row" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(doc.location)}', '_blank')">
                     <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
-                    <span>${doc.location}, Surat</span>
+                    <span>${doc.location}</span>
                 </div>
                 <div class="ag-info-row">
                     <i data-lucide="phone" style="width: 18px; height: 18px;"></i>
                     <span>${doc.phone}</span>
+                </div>
+                <div class="ag-info-row">
+                    <i data-lucide="clock" style="width: 18px; height: 18px;"></i>
+                    <span>${doc.timing}</span>
                 </div>
                 <button class="ag-button ag-button-primary ag-button-full" onclick="openBookingModal(${doc.id})">
                     Book Appointment
@@ -92,11 +96,23 @@ function openBookingModal(doctorId) {
 
     document.getElementById('modalHospital').value = doc.hospital;
     document.getElementById('modalDoctor').value = doc.name;
-    document.getElementById('modalLocation').value = doc.location + ", Surat";
+    document.getElementById('modalLocation').value = doc.location;
     
     // Set min date for appointment to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('appointmentDate').setAttribute('min', today);
+    
+    // Dynamically populate time slots based on doctor's timing
+    const timeSlotSelect = bookingForm.querySelector('select[name="timeSlot"]');
+    timeSlotSelect.innerHTML = '<option value="">Select Time</option>';
+    if (doc.slots) {
+        doc.slots.forEach(slot => {
+            const option = document.createElement('option');
+            option.textContent = slot;
+            option.value = slot;
+            timeSlotSelect.appendChild(option);
+        });
+    }
 
     bookingModalOverlay.style.display = 'flex';
     document.body.style.overflow = 'hidden'; // Prevent scroll
@@ -109,11 +125,12 @@ function closeBookingModal() {
 }
 
 // Notification System
-function showNotification(message) {
+function showNotification(message, type = "success") {
     const notif = document.createElement('div');
-    notif.className = 'ag-notification ag-notification-success';
+    const isError = type === "error";
+    notif.className = `ag-notification ${isError ? 'ag-notification-error' : 'ag-notification-success'}`;
     notif.innerHTML = `
-        <i data-lucide="check-circle" style="color: #059669;"></i>
+        <i data-lucide="${isError ? 'x-circle' : 'check-circle'}" style="color: ${isError ? '#dc2626' : '#059669'};"></i>
         <div>${message}</div>
     `;
     notifContainer.appendChild(notif);
@@ -150,18 +167,56 @@ bookingModalOverlay.addEventListener('click', (e) => {
     if (e.target === bookingModalOverlay) closeBookingModal();
 });
 
+// n8n Webhook URL
+const N8N_WEBHOOK_URL = "https://bhavanaben.app.n8n.cloud/webhook/book-appointment";
+
 // Form Submission
-bookingForm.addEventListener('submit', (e) => {
+bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // Simple verification
+
     const formData = new FormData(bookingForm);
     const data = Object.fromEntries(formData);
-    
-    console.log("Appointment Booked:", data);
-    
-    closeBookingModal();
-    showNotification("Your appointment has been booked successfully! A confirmation call will reach you within 2 hours.");
+
+    // Build the payload with all appointment details
+    const payload = {
+        hospital:       document.getElementById('modalHospital').value,
+        doctor:         document.getElementById('modalDoctor').value,
+        location:       document.getElementById('modalLocation').value,
+        patientName:    data.fullName,
+        dateOfBirth:    data.dob,
+        mobile:         data.mobile,
+        healthIssue:    data.issue || "Not specified",
+        appointmentDate: data.appDate,
+        timeSlot:       data.timeSlot,
+        bookedAt:       new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    };
+
+    // Show loading state on button
+    const submitBtn = bookingForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Booking...";
+
+    try {
+        const response = await fetch(N8N_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            closeBookingModal();
+            showNotification(`✅ Appointment confirmed for ${payload.patientName} with ${payload.doctor} on ${payload.appointmentDate} at ${payload.timeSlot}.`);
+        } else {
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+    } catch (error) {
+        console.error("Booking failed:", error);
+        showNotification("❌ Booking failed. Please try again or contact us directly.", "error");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
 });
 
 // 6. Initialize
